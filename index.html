@@ -1,0 +1,1928 @@
+python3 << 'PYEOF'
+import json
+
+with open('/tmp/assets.json') as f:
+    A = json.load(f)
+
+html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store In Jaipur — Premium Fashion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================
+   RESET & VARIABLES
+============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --gold: #C9A84C;
+  --gold-light: #e8c96a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --black: #060504;
+  --dark: #0c0b09;
+  --dark2: #121110;
+  --white: #f4f1ec;
+  --gray: #6e6860;
+  --border: rgba(201,168,76,0.14);
+  --border2: rgba(244,241,236,0.08);
+  --serif: 'Cormorant Garamond', serif;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sans);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+::selection { background: var(--gold); color: var(--black); }
+
+/* ============================================
+   CUSTOM CURSOR
+============================================ */
+#cursor-dot {
+  position: fixed; width: 6px; height: 6px;
+  background: var(--gold); border-radius: 50%;
+  pointer-events: none; z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+  mix-blend-mode: normal;
+}
+#cursor-circle {
+  position: fixed; width: 44px; height: 44px;
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 50%;
+  pointer-events: none; z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s var(--ease-out), width 0.4s, height 0.4s, border-color 0.3s, opacity 0.3s;
+}
+#cursor-text {
+  position: fixed; pointer-events: none; z-index: 99997;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); opacity: 0; transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+body:hover #cursor-dot { opacity: 1; }
+
+/* ============================================
+   LOADER
+============================================ */
+#loader {
+  position: fixed; inset: 0; z-index: 100000;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px; transition: opacity 0.8s, visibility 0.8s;
+}
+#loader.gone { opacity: 0; visibility: hidden; }
+.loader-logo {
+  font-family: var(--display);
+  font-size: 32px; letter-spacing: 8px; color: var(--gold);
+  opacity: 0; animation: loaderFadeIn 0.6s 0.3s forwards;
+}
+.loader-logo span { color: var(--white); }
+.loader-bar-wrap {
+  width: 200px; height: 1px;
+  background: var(--border2); overflow: hidden;
+  opacity: 0; animation: loaderFadeIn 0.6s 0.5s forwards;
+}
+.loader-bar {
+  height: 100%; width: 0; background: var(--gold);
+  animation: loaderProgress 1.8s 0.5s var(--ease-in-out) forwards;
+}
+.loader-pct {
+  font-size: 11px; letter-spacing: 3px; color: var(--gray);
+  opacity: 0; animation: loaderFadeIn 0.6s 0.5s forwards;
+}
+@keyframes loaderFadeIn { to { opacity: 1; } }
+@keyframes loaderProgress { to { width: 100%; } }
+
+/* ============================================
+   NOISE TEXTURE OVERLAY
+============================================ */
+.noise {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ============================================
+   NAVIGATION
+============================================ */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 1000; padding: 28px 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.5s var(--ease-out);
+}
+#navbar::before {
+  content: ''; position: absolute; inset: 0;
+  background: transparent; backdrop-filter: blur(0px);
+  transition: all 0.5s;
+  border-bottom: 1px solid transparent;
+}
+#navbar.sticky::before {
+  background: rgba(6,5,4,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: var(--border);
+}
+#navbar.sticky { padding: 16px 56px; }
+
+.nav-logo {
+  font-family: var(--display);
+  font-size: 20px; letter-spacing: 5px;
+  color: var(--gold); position: relative; z-index: 1;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--white); }
+
+.nav-center {
+  display: flex; gap: 40px; align-items: center;
+  position: relative; z-index: 1;
+}
+.nav-center a {
+  color: var(--white); text-decoration: none;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  font-weight: 400; opacity: 0.5;
+  transition: opacity 0.3s, color 0.3s;
+  position: relative;
+}
+.nav-center a::after {
+  content: ''; position: absolute; bottom: -6px; left: 0;
+  width: 0; height: 1px; background: var(--gold);
+  transition: width 0.4s var(--ease-out);
+}
+.nav-center a:hover, .nav-center a.active { opacity: 1; color: var(--gold); }
+.nav-center a:hover::after, .nav-center a.active::after { width: 100%; }
+
+.nav-right {
+  display: flex; gap: 12px; align-items: center;
+  position: relative; z-index: 1;
+}
+.nav-btn {
+  font-family: var(--sans); font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; cursor: pointer; padding: 10px 24px;
+  transition: all 0.35s; border: none; font-weight: 400;
+}
+.nav-btn-ghost {
+  background: transparent; color: var(--white);
+  border: 1px solid var(--border2);
+}
+.nav-btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn-fill { background: var(--gold); color: var(--black); }
+.nav-btn-fill:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+#user-pill {
+  display: none; align-items: center; gap: 14px;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold); color: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+#user-name-display { font-size: 12px; opacity: 0.65; letter-spacing: 0.5px; }
+.nav-btn-logout {
+  background: transparent; color: var(--white); padding: 8px 18px;
+  font-size: 9px; letter-spacing: 2px; border: 1px solid rgba(224,85,85,0.25);
+  transition: all 0.3s; opacity: 0.6;
+}
+.nav-btn-logout:hover { border-color: #e05555; color: #e05555; opacity: 1; }
+#admin-nav-link {
+  display: none; background: transparent; border: 1px solid var(--border);
+  color: var(--gold); padding: 8px 18px; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none; font-family: var(--sans);
+  transition: all 0.3s; cursor: pointer;
+}
+#admin-nav-link:hover { background: var(--gold); color: var(--black); }
+
+/* ============================================
+   HERO — VIDEO BACKGROUND
+============================================ */
+#hero {
+  position: relative; height: 100vh; min-height: 700px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.hero-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+.hero-grad {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(6,5,4,0.88) 0%,
+    rgba(6,5,4,0.45) 40%,
+    rgba(6,5,4,0.55) 70%,
+    rgba(6,5,4,0.85) 100%
+  );
+}
+.hero-grad-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+  background: linear-gradient(to top, var(--black), transparent);
+  z-index: 2;
+}
+/* Decorative grid lines */
+.hero-grid {
+  position: absolute; inset: 0; z-index: 2;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.hero-content {
+  position: relative; z-index: 3;
+  text-align: center; padding: 0 24px;
+  max-width: 900px;
+}
+.hero-eyebrow {
+  font-size: 10px; letter-spacing: 8px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px;
+  opacity: 0; animation: heroUp 1s 0.5s var(--ease-out) forwards;
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; width: 40px; height: 1px; background: var(--gold); opacity: 0.4;
+}
+.hero-h1 {
+  font-family: var(--serif); font-weight: 300;
+  font-size: clamp(64px, 10vw, 140px);
+  line-height: 0.88; letter-spacing: -2px;
+  opacity: 0; animation: heroUp 1s 0.7s var(--ease-out) forwards;
+}
+.hero-h1 em { font-style: italic; color: var(--gold); }
+.hero-h1 .line2 { display: block; padding-left: 60px; }
+.hero-sub {
+  font-size: 14px; font-weight: 300; line-height: 1.9;
+  color: rgba(244,241,236,0.55); margin: 36px auto 52px;
+  max-width: 460px; letter-spacing: 0.5px;
+  opacity: 0; animation: heroUp 1s 0.9s var(--ease-out) forwards;
+}
+.hero-ctas {
+  display: flex; gap: 16px; justify-content: center;
+  opacity: 0; animation: heroUp 1s 1.1s var(--ease-out) forwards;
+}
+.btn-gold {
+  background: var(--gold); color: var(--black);
+  border: none; padding: 18px 48px;
+  font-family: var(--sans); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; font-weight: 500; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: all 0.4s var(--ease-out);
+  position: relative; overflow: hidden;
+}
+.btn-gold::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold-light); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.4s var(--ease-out);
+}
+.btn-gold:hover::before { transform: scaleX(1); }
+.btn-gold span { position: relative; z-index: 1; }
+.btn-ghost {
+  background: transparent; color: var(--white);
+  border: 1px solid rgba(244,241,236,0.25);
+  padding: 18px 48px;
+  font-family: var(--sans); font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; font-weight: 300; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: all 0.4s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: 0; animation: heroUp 1s 1.4s var(--ease-out) forwards;
+}
+.hero-scroll-text {
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  opacity: 0.35;
+}
+.hero-scroll-line {
+  width: 1px; height: 60px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.1); }
+}
+
+/* Hero side badge */
+.hero-badge {
+  position: absolute; right: 56px; bottom: 120px;
+  z-index: 3; text-align: right;
+  opacity: 0; animation: heroUp 1s 1.3s var(--ease-out) forwards;
+}
+.hero-badge-line {
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  opacity: 0.35; margin-bottom: 4px;
+}
+.hero-badge-val {
+  font-family: var(--display); font-size: 42px; color: var(--gold);
+  line-height: 1;
+}
+
+@keyframes heroUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   TICKER / MARQUEE
+============================================ */
+.marquee-wrap {
+  background: var(--gold); padding: 13px 0;
+  overflow: hidden; position: relative;
+}
+.marquee-track {
+  display: flex; gap: 0;
+  animation: marquee 35s linear infinite;
+  width: max-content;
+}
+.marquee-item {
+  font-family: var(--display); font-size: 13px;
+  letter-spacing: 5px; color: var(--black);
+  padding: 0 36px; white-space: nowrap;
+}
+.marquee-dot { color: rgba(0,0,0,0.35); }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================
+   SECTION UTILITIES
+============================================ */
+.section { padding: 120px 0; }
+.section-sm { padding: 80px 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 56px; }
+.label {
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--gold); display: block; margin-bottom: 18px;
+}
+.heading {
+  font-family: var(--serif); font-weight: 300;
+  font-size: clamp(36px, 4.5vw, 68px);
+  line-height: 1.02;
+}
+.heading em { font-style: italic; color: var(--gold); }
+.divider { width: 60px; height: 1px; background: var(--gold); margin: 28px 0; }
+
+/* ============================================
+   REVEAL ANIMATIONS
+============================================ */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out); }
+.reveal-left.in { opacity: 1; transform: none; }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out); }
+.reveal-right.in { opacity: 1; transform: none; }
+.d1 { transition-delay: 0.1s; }
+.d2 { transition-delay: 0.2s; }
+.d3 { transition-delay: 0.3s; }
+.d4 { transition-delay: 0.4s; }
+.d5 { transition-delay: 0.5s; }
+
+/* ============================================
+   ABOUT SECTION
+============================================ */
+#about { background: var(--dark); }
+.about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 100px; align-items: center; }
+
+.about-visual { position: relative; }
+.about-img-main {
+  width: 100%; aspect-ratio: 4/5; object-fit: cover;
+  display: block;
+}
+.about-img-float {
+  position: absolute; bottom: -40px; right: -40px;
+  width: 55%; aspect-ratio: 1/1; object-fit: cover;
+  border: 6px solid var(--dark);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+.about-corner {
+  position: absolute; top: -12px; left: -12px;
+  width: 80px; height: 80px;
+  border-left: 2px solid var(--gold);
+  border-top: 2px solid var(--gold);
+  opacity: 0.5;
+}
+.about-corner-br {
+  position: absolute; bottom: -52px; right: -52px;
+  width: 80px; height: 80px;
+  border-right: 2px solid var(--gold);
+  border-bottom: 2px solid var(--gold);
+  opacity: 0.5;
+}
+
+.about-text p {
+  font-size: 14px; line-height: 1.95;
+  color: rgba(244,241,236,0.55); margin-bottom: 18px;
+  font-weight: 300;
+}
+.about-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; margin-top: 48px;
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+}
+.about-stat { padding-right: 24px; border-right: 1px solid var(--border); }
+.about-stat:last-child { border-right: none; padding-right: 0; padding-left: 24px; }
+.about-stat:nth-child(2) { padding: 0 24px; }
+.stat-number {
+  font-family: var(--display); font-size: 56px;
+  color: var(--gold); line-height: 1; margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  opacity: 0.4;
+}
+
+/* ============================================
+   COLLECTIONS — EDITORIAL GRID
+============================================ */
+#collections { background: var(--black); }
+.coll-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
+
+.coll-masonry {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 280px 280px;
+  gap: 4px;
+}
+.coll-item {
+  position: relative; overflow: hidden;
+  cursor: pointer;
+}
+.coll-item:nth-child(1) { grid-column: 1/6; grid-row: 1/3; }
+.coll-item:nth-child(2) { grid-column: 6/9; grid-row: 1/2; }
+.coll-item:nth-child(3) { grid-column: 9/13; grid-row: 1/2; }
+.coll-item:nth-child(4) { grid-column: 6/9; grid-row: 2/3; }
+.coll-item:nth-child(5) { grid-column: 9/13; grid-row: 2/3; }
+
+.coll-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 1s var(--ease-out);
+}
+.coll-item:hover img { transform: scale(1.08); }
+
+.coll-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(6,5,4,0.9) 0%, rgba(6,5,4,0.2) 50%, transparent 100%);
+  opacity: 0; transition: opacity 0.5s;
+}
+.coll-item:hover .coll-overlay { opacity: 1; }
+
+.coll-info {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 28px 24px;
+  transform: translateY(10px); opacity: 0;
+  transition: all 0.5s var(--ease-out);
+}
+.coll-item:hover .coll-info { opacity: 1; transform: none; }
+.coll-cat { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.coll-name { font-family: var(--serif); font-size: 20px; font-weight: 300; }
+
+/* Number badge */
+.coll-num {
+  position: absolute; top: 18px; right: 18px;
+  font-family: var(--display); font-size: 11px;
+  letter-spacing: 2px; color: var(--white);
+  background: rgba(6,5,4,0.6);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  opacity: 0; transition: opacity 0.4s;
+}
+.coll-item:hover .coll-num { opacity: 1; }
+
+/* ============================================
+   FEATURED PRODUCTS — HORIZONTAL SCROLL
+============================================ */
+#featured { background: var(--dark2); overflow: hidden; }
+.featured-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px; }
+
+.products-track-wrap {
+  overflow: hidden; position: relative;
+  cursor: grab;
+}
+.products-track-wrap:active { cursor: grabbing; }
+.products-track {
+  display: flex; gap: 24px;
+  transition: transform 0.5s var(--ease-out);
+  user-select: none;
+}
+.product-card {
+  flex: 0 0 320px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.4s, transform 0.4s;
+}
+.product-card:hover { border-color: var(--gold); transform: translateY(-6px); }
+.product-img {
+  height: 360px; overflow: hidden; position: relative;
+}
+.product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-out); }
+.product-card:hover .product-img img { transform: scale(1.05); }
+.product-tag {
+  position: absolute; top: 16px; left: 16px;
+  background: var(--gold); color: var(--black);
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 12px; font-weight: 500;
+}
+.product-body { padding: 22px; background: var(--dark); }
+.product-brand { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.product-name { font-family: var(--serif); font-size: 20px; font-weight: 300; margin-bottom: 14px; }
+.product-cta {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gray); display: flex; align-items: center; gap: 8px;
+  transition: color 0.3s; cursor: pointer; background: none; border: none;
+  font-family: var(--sans);
+}
+.product-cta::after { content: '→'; transition: transform 0.3s; }
+.product-card:hover .product-cta { color: var(--gold); }
+.product-card:hover .product-cta::after { transform: translateX(4px); }
+
+.scroll-hint {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0.4; margin-top: 24px;
+}
+.scroll-hint::before, .scroll-hint::after {
+  content: ''; flex: 1; height: 1px; background: var(--border2);
+}
+
+/* ============================================
+   BRANDS STRIP
+============================================ */
+#brands { background: var(--dark); }
+.brands-header { text-align: center; margin-bottom: 60px; }
+.brands-grid {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+.brand-pill {
+  border: 1px solid var(--border);
+  padding: 12px 30px; font-size: 10px;
+  letter-spacing: 3px; text-transform: uppercase;
+  font-weight: 400; transition: all 0.35s; cursor: pointer;
+  position: relative; overflow: hidden;
+}
+.brand-pill::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold-dim); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.35s var(--ease-out);
+}
+.brand-pill:hover::before { transform: scaleX(1); }
+.brand-pill:hover { border-color: var(--gold); color: var(--gold); }
+.brand-pill span { position: relative; z-index: 1; }
+
+/* ============================================
+   GALLERY — IMAGE WALL
+============================================ */
+#gallery { background: var(--black); }
+.gallery-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+.gallery-wall {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 260px 260px;
+  gap: 4px;
+}
+.gal-cell {
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.gal-cell:nth-child(1) { grid-column: 1/3; }
+.gal-cell:nth-child(5) { grid-column: 3/5; }
+.gal-cell img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.8s var(--ease-out), filter 0.5s;
+}
+.gal-cell:hover img { transform: scale(1.06); filter: brightness(0.7); }
+.gal-hover {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; opacity: 0; transition: opacity 0.4s;
+}
+.gal-cell:hover .gal-hover { opacity: 1; }
+.gal-icon { font-size: 28px; }
+.gal-label {
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ============================================
+   WHY US — FEATURE STRIP
+============================================ */
+#why { background: var(--dark); }
+.why-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+  margin-top: 64px;
+}
+.why-card {
+  padding: 52px 36px;
+  border-right: 1px solid var(--border);
+  transition: background 0.4s;
+  position: relative;
+}
+.why-card:last-child { border-right: none; }
+.why-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.5s var(--ease-out);
+}
+.why-card:hover::before { transform: scaleX(1); }
+.why-card:hover { background: rgba(201,168,76,0.04); }
+.why-num {
+  font-family: var(--display); font-size: 64px;
+  color: var(--border); line-height: 1; margin-bottom: 20px;
+}
+.why-title { font-family: var(--serif); font-size: 26px; font-weight: 300; margin-bottom: 14px; }
+.why-desc { font-size: 13px; font-weight: 300; opacity: 0.45; line-height: 1.8; }
+
+/* ============================================
+   CONTACT
+============================================ */
+#contact { background: var(--black); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 100px; align-items: start; }
+.contact-info p {
+  font-size: 14px; font-weight: 300; opacity: 0.5;
+  line-height: 1.9; margin-bottom: 40px;
+}
+.info-row { margin-bottom: 28px; }
+.info-row-label {
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 8px;
+}
+.info-row-val { font-size: 14px; font-weight: 300; opacity: 0.65; line-height: 1.7; }
+
+.contact-map-thumb {
+  width: 100%; height: 200px; object-fit: cover;
+  border: 1px solid var(--border); margin-top: 40px;
+  display: block;
+  filter: grayscale(100%) brightness(0.6) sepia(20%);
+  transition: filter 0.5s;
+}
+.contact-map-thumb:hover { filter: grayscale(0%) brightness(1); }
+
+.form-box { background: var(--dark2); border: 1px solid var(--border); padding: 56px; }
+.form-group { margin-bottom: 24px; }
+.form-group label {
+  display: block; font-size: 9px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray); margin-bottom: 10px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%; background: rgba(244,241,236,0.03);
+  border: 1px solid var(--border); color: var(--white);
+  padding: 14px 18px; font-family: var(--sans);
+  font-size: 13px; font-weight: 300; outline: none;
+  transition: border-color 0.3s, background 0.3s;
+  -webkit-appearance: none; appearance: none;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.03);
+}
+.form-group textarea { height: 130px; resize: vertical; }
+.form-group select option { background: var(--dark2); }
+.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+#form-success {
+  display: none; margin-top: 16px;
+  font-size: 12px; color: var(--gold);
+  letter-spacing: 1px; opacity: 0.8;
+}
+
+/* ============================================
+   FOOTER
+============================================ */
+footer { background: var(--dark2); border-top: 1px solid var(--border); }
+.footer-top { padding: 80px 0 60px; }
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 64px;
+}
+.footer-brand-logo {
+  font-family: var(--display); font-size: 28px;
+  letter-spacing: 5px; color: var(--gold);
+  margin-bottom: 16px;
+}
+.footer-brand-logo span { color: var(--white); }
+.footer-tagline {
+  font-size: 13px; font-weight: 300; opacity: 0.38;
+  line-height: 1.8; max-width: 240px;
+}
+.footer-col h4 {
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 22px;
+}
+.footer-col a {
+  display: block; color: var(--white);
+  text-decoration: none; font-size: 13px;
+  font-weight: 300; opacity: 0.35;
+  margin-bottom: 12px; transition: opacity 0.3s, color 0.3s;
+}
+.footer-col a:hover { opacity: 0.9; color: var(--gold); }
+.footer-address {
+  font-size: 12px; font-weight: 300; opacity: 0.35;
+  line-height: 1.8;
+}
+.footer-bottom {
+  padding: 22px 0; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-copy { font-size: 11px; opacity: 0.25; letter-spacing: 0.5px; }
+
+/* ============================================
+   AUTH MODAL
+============================================ */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 100000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  display: none; align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal-box {
+  background: var(--dark2); border: 1px solid var(--border);
+  width: 100%; max-width: 460px; padding: 52px;
+  position: relative;
+  animation: modalIn 0.4s var(--ease-out);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-close {
+  position: absolute; top: 18px; right: 22px;
+  background: none; border: none; color: var(--white);
+  font-size: 20px; cursor: pointer; opacity: 0.3;
+  transition: opacity 0.3s; line-height: 1;
+}
+.modal-close:hover { opacity: 0.9; }
+.modal-logo {
+  font-family: var(--display); font-size: 18px;
+  letter-spacing: 4px; color: var(--gold);
+  margin-bottom: 32px;
+}
+.modal-logo span { color: var(--white); }
+.modal-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 36px; }
+.modal-tab {
+  flex: 1; background: none; border: none;
+  color: var(--white); padding: 13px;
+  font-family: var(--sans); font-size: 10px;
+  letter-spacing: 3px; text-transform: uppercase;
+  cursor: pointer; opacity: 0.35;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: all 0.3s;
+}
+.modal-tab.on { opacity: 1; color: var(--gold); border-bottom-color: var(--gold); }
+.modal-panel { display: none; }
+.modal-panel.on { display: block; }
+.modal-err { color: #e05555; font-size: 12px; margin-top: 14px; display: none; }
+.modal-hint {
+  text-align: center; margin-top: 22px;
+  font-size: 11px; opacity: 0.3; letter-spacing: 0.5px;
+  border-top: 1px solid var(--border); padding-top: 20px;
+}
+
+/* ============================================
+   ADMIN PANEL
+============================================ */
+#admin-shell { display: none; }
+body.admin-mode #admin-shell { display: flex; }
+body.admin-mode main { display: none; }
+
+.admin-sidebar {
+  width: 270px; background: var(--dark2);
+  border-right: 1px solid var(--border);
+  position: fixed; top: 0; bottom: 0; left: 0;
+  z-index: 900; display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.sidebar-head {
+  padding: 28px; border-bottom: 1px solid var(--border);
+}
+.sidebar-logo {
+  font-family: var(--display); font-size: 18px;
+  letter-spacing: 4px; color: var(--gold); margin-bottom: 6px;
+}
+.sidebar-logo span { color: var(--white); }
+.sidebar-badge {
+  display: inline-block; background: var(--gold);
+  color: var(--black); font-size: 9px;
+  letter-spacing: 2px; padding: 3px 10px;
+  text-transform: uppercase; font-weight: 500;
+}
+.sidebar-nav { flex: 1; padding: 16px 0; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 28px; color: var(--white);
+  text-decoration: none; font-size: 10px;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  font-weight: 400; opacity: 0.4;
+  border-left: 2px solid transparent;
+  transition: all 0.3s;
+}
+.sidebar-nav a:hover { opacity: 0.8; background: rgba(201,168,76,0.04); }
+.sidebar-nav a.on {
+  opacity: 1; color: var(--gold);
+  border-left-color: var(--gold);
+  background: rgba(201,168,76,0.07);
+}
+.sidebar-nav-icon { font-size: 15px; width: 20px; text-align: center; }
+.sidebar-foot {
+  padding: 24px 28px; border-top: 1px solid var(--border);
+}
+.sidebar-user {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.sidebar-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--gold); color: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 600;
+}
+.sidebar-uname { font-size: 13px; font-weight: 400; }
+.sidebar-uemail { font-size: 11px; opacity: 0.35; margin-top: 2px; }
+.sidebar-logout {
+  width: 100%; background: transparent;
+  border: 1px solid rgba(224,85,85,0.25);
+  color: #e05555; padding: 10px;
+  font-family: var(--sans); font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.3s; opacity: 0.7;
+}
+.sidebar-logout:hover { opacity: 1; background: rgba(224,85,85,0.1); }
+
+.admin-main-wrap {
+  margin-left: 270px; flex: 1; padding: 44px;
+  min-height: 100vh;
+}
+.admin-topbar {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 44px;
+}
+.admin-page-title {
+  font-family: var(--serif); font-size: 44px;
+  font-weight: 300; line-height: 1;
+}
+.admin-page-title em { font-style: italic; color: var(--gold); }
+.admin-date { font-size: 11px; opacity: 0.3; letter-spacing: 1px; }
+
+.admin-panel { display: none; }
+.admin-panel.on { display: block; }
+
+/* Admin stat cards */
+.admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+.a-stat {
+  background: var(--dark2); border: 1px solid var(--border);
+  padding: 28px 24px; transition: border-color 0.3s;
+}
+.a-stat:hover { border-color: var(--gold); }
+.a-stat-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.a-stat-val { font-family: var(--display); font-size: 52px; color: var(--white); line-height: 1; }
+.a-stat-sub { font-size: 11px; opacity: 0.3; margin-top: 4px; }
+
+/* Admin table */
+.a-table-card {
+  background: var(--dark2); border: 1px solid var(--border); overflow: hidden;
+}
+.a-table-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+}
+.a-table-head h3 { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 400; }
+.a-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--white); padding: 7px 18px;
+  font-family: var(--sans); font-size: 9px;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  transition: all 0.3s;
+}
+.a-btn:hover { border-color: var(--gold); color: var(--gold); }
+.a-btn-gold { background: var(--gold); border-color: var(--gold); color: var(--black); font-weight: 500; }
+.a-btn-gold:hover { background: var(--gold-light); color: var(--black); }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 12px 20px; text-align: left;
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  opacity: 0.35; font-weight: 400;
+  border-bottom: 1px solid var(--border);
+}
+tbody td { padding: 15px 20px; font-size: 13px; font-weight: 300; border-bottom: 1px solid rgba(201,168,76,0.06); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(201,168,76,0.025); }
+.badge { display: inline-block; padding: 3px 10px; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+.badge-green { background: rgba(72,199,116,0.15); color: #48c774; }
+.badge-red { background: rgba(224,85,85,0.15); color: #e05555; }
+
+/* Chart bars */
+.chart-bar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.chart-bar-label { font-size: 11px; opacity: 0.5; width: 120px; flex-shrink: 0; }
+.chart-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.05); overflow: hidden; }
+.chart-bar-fill { height: 100%; background: var(--gold); transition: width 1.4s var(--ease-out); }
+.chart-bar-val { font-size: 11px; opacity: 0.35; width: 40px; text-align: right; }
+
+/* Messages */
+.msg-card {
+  background: rgba(244,241,236,0.02); border: 1px solid var(--border);
+  padding: 22px 24px; margin-bottom: 12px; transition: border-color 0.3s;
+}
+.msg-card:hover { border-color: var(--gold); }
+.msg-from { font-size: 14px; font-weight: 400; margin-bottom: 4px; }
+.msg-meta { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.msg-body { font-size: 13px; opacity: 0.45; line-height: 1.7; }
+.msg-time { font-size: 11px; opacity: 0.25; margin-top: 8px; }
+
+/* Access denied screen */
+#access-denied {
+  display: none; position: fixed; inset: 0; z-index: 200000;
+  background: var(--black);
+  flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+}
+#access-denied h2 {
+  font-family: var(--display); font-size: 32px;
+  letter-spacing: 6px; color: var(--gold);
+}
+#access-denied p { opacity: 0.4; font-size: 14px; }
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 1024px) {
+  .wrap { padding: 0 28px; }
+  .about-grid { grid-template-columns: 1fr; gap: 60px; }
+  .about-img-float { bottom: -20px; right: -20px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 60px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .why-grid { grid-template-columns: 1fr 1fr; }
+  .why-card:nth-child(2n) { border-right: none; }
+}
+@media (max-width: 768px) {
+  .nav-center { display: none; }
+  #navbar { padding: 18px 24px; }
+  #navbar.sticky { padding: 14px 24px; }
+  .hero-h1 { font-size: 52px; letter-spacing: -1px; }
+  .hero-h1 .line2 { padding-left: 20px; }
+  .hero-badge { display: none; }
+  .section { padding: 72px 0; }
+  .coll-masonry { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .coll-item:nth-child(1), .coll-item:nth-child(2), .coll-item:nth-child(3), .coll-item:nth-child(4), .coll-item:nth-child(5) {
+    grid-column: auto; grid-row: auto;
+  }
+  .coll-item img { min-height: 220px; }
+  .gallery-wall { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .gal-cell:nth-child(1), .gal-cell:nth-child(5) { grid-column: auto; }
+  .admin-sidebar { transform: translateX(-100%); }
+  .admin-main-wrap { margin-left: 0; padding: 20px; }
+  .admin-stats { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NOISE OVERLAY -->
+<div class="noise"></div>
+
+<!-- CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-circle"></div>
+<div id="cursor-text"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">STORE IN <span>JAIPUR</span></div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-pct" id="loader-pct">0%</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">STORE IN <span>JAIPUR</span></div>
+    <div class="modal-tabs">
+      <button class="modal-tab on" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="modal-tab" id="tab-signup" onclick="switchTab('signup')">Register</button>
+    </div>
+    <div class="modal-panel on" id="panel-login">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="l-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-gold" style="width:100%;margin-top:8px;text-align:center" onclick="doLogin()"><span>Sign In</span></button>
+      <p id="login-err" class="modal-err"></p>
+      <p class="modal-hint">Admin access: admin@store.com / admin123</p>
+    </div>
+    <div class="modal-panel" id="panel-signup">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="s-name" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="s-email" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="s-pass" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()">
+      </div>
+      <button class="btn-gold" style="width:100%;margin-top:8px;text-align:center" onclick="doSignup()"><span>Create Account</span></button>
+      <p id="signup-err" class="modal-err"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS DENIED -->
+<div id="access-denied">
+  <h2>ACCESS DENIED</h2>
+  <p>This area is restricted to administrators only.</p>
+  <a href="#" class="btn-gold" onclick="exitAdmin()" style="margin-top:8px"><span>← Back to Store</span></a>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">STORE IN <span>JAIPUR</span></a>
+  <div class="nav-center">
+    <a href="#hero" class="active">Home</a>
+    <a href="#about">About</a>
+    <a href="#collections">Collections</a>
+    <a href="#brands">Brands</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#contact">Contact</a>
+    <a href="#" id="admin-nav-link" onclick="openAdmin(event)">Admin</a>
+  </div>
+  <div class="nav-right" id="nav-auth-area">
+    <div id="nav-auth-buttons">
+      <button class="nav-btn nav-btn-ghost" onclick="openModal('login')">Sign In</button>
+      <button class="nav-btn nav-btn-fill" onclick="openModal('signup')">Register</button>
+    </div>
+    <div id="user-pill">
+      <span id="user-name-display"></span>
+      <div class="user-avatar" id="user-avatar-circle">U</div>
+      <button class="nav-btn nav-btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== MAIN SITE ===================== -->
+<main id="site-main">
+
+<!-- HERO -->
+<section id="hero">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src=\"""" + A['video'] + """\" type="video/mp4">
+  </video>
+  <div class="hero-grad"></div>
+  <div class="hero-grad-bottom"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Chitrakoot · Jaipur · Rajasthan</div>
+    <h1 class="hero-h1">We Give<br><em class="line2">The Best</em></h1>
+    <p class="hero-sub">Premium fashion for men &amp; women. Authentic global brands — curated for those who demand the extraordinary.</p>
+    <div class="hero-ctas">
+      <a href="#collections" class="btn-gold"><span>Explore Collections</span></a>
+      <a href="#contact" class="btn-ghost">Find Us</a>
+    </div>
+  </div>
+  <div class="hero-badge">
+    <div class="hero-badge-line">Styles In Store</div>
+    <div class="hero-badge-val">500+</div>
+  </div>
+  <div class="hero-scroll">
+    <span class="hero-scroll-text">Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">""" + "".join([f'<span class="marquee-item">{b} <span class="marquee-dot">✦</span></span>' for b in ["BOSS","TOMMY HILFIGER","RALPH LAUREN","VERSACE","BURBERRY","PRADA","MARC JACOBS","COACH","DAVIDOFF","ALLEN SOLLY","ARMANI","ISSEY MIYAKE"] * 2]) + """</div>
+</div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-visual reveal-left">
+        <div class="about-corner"></div>
+        <img src=\"""" + A['store_wide'] + """\" class="about-img-main" alt="Store Interior">
+        <img src=\"""" + A['perf'] + """\" class="about-img-float" alt="Fragrances Collection">
+        <div class="about-corner-br"></div>
+      </div>
+      <div class="about-text">
+        <span class="label reveal">Our Story</span>
+        <h2 class="heading reveal d1">Fashion <em>Curated</em><br>for the Bold</h2>
+        <div class="divider reveal d2"></div>
+        <p class="reveal d2">Nestled opposite Chitrakoot Stadium, Store In Jaipur was born from a deep passion for bringing world-class fashion to the Pink City. Every piece is handpicked for authenticity, craft, and timeless style.</p>
+        <p class="reveal d3">From Boss to Ralph Lauren, Versace to Burberry — we carry the brands that matter. Men's, women's, fragrances, footwear — one address for everything exceptional.</p>
+        <div class="about-stats reveal d4">
+          <div class="about-stat"><div class="stat-number">500</div><div class="stat-label">Curated Styles</div></div>
+          <div class="about-stat"><div class="stat-number">50</div><div class="stat-label">Premium Brands</div></div>
+          <div class="about-stat"><div class="stat-number">∞</div><div class="stat-label">Happy Clients</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTIONS -->
+<section class="section" id="collections">
+  <div class="wrap">
+    <div class="coll-header">
+      <div>
+        <span class="label reveal">What We Carry</span>
+        <h2 class="heading reveal d1">Our <em>Collections</em></h2>
+      </div>
+      <a href="#contact" class="btn-ghost reveal d2">Visit Store ↗</a>
+    </div>
+    <div class="coll-masonry reveal">
+      <div class="coll-item">
+        <img src=\"""" + A['store_main'] + """\" alt="Main Collection">
+        <div class="coll-overlay"></div>
+        <div class="coll-num">01/05</div>
+        <div class="coll-info"><div class="coll-cat">Full Store View</div><div class="coll-name">Everything Under One Roof</div></div>
+      </div>
+      <div class="coll-item">
+        <img src=\"""" + A['tshirt'] + """\" alt="T-Shirts" style="object-position:top">
+        <div class="coll-overlay"></div>
+        <div class="coll-num">02/05</div>
+        <div class="coll-info"><div class="coll-cat">Men's</div><div class="coll-name">Premium T-Shirts</div></div>
+      </div>
+      <div class="coll-item">
+        <img src=\"""" + A['perf'] + """\" alt="Fragrances">
+        <div class="coll-overlay"></div>
+        <div class="coll-num">03/05</div>
+        <div class="coll-info"><div class="coll-cat">Luxury</div><div class="coll-name">Fragrances & Perfumes</div></div>
+      </div>
+      <div class="coll-item">
+        <img src=\"""" + A['kurta'] + """\" alt="Women's" style="object-position:top">
+        <div class="coll-overlay"></div>
+        <div class="coll-num">04/05</div>
+        <div class="coll-info"><div class="coll-cat">Women's</div><div class="coll-name">Elegant Ethnic Wear</div></div>
+      </div>
+      <div class="coll-item">
+        <img src=\"""" + A['suit'] + """\" alt="Formal" style="object-position:top">
+        <div class="coll-overlay"></div>
+        <div class="coll-num">05/05</div>
+        <div class="coll-info"><div class="coll-cat">Formal</div><div class="coll-name">Designer Suits</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section" id="featured">
+  <div class="wrap">
+    <div class="featured-header">
+      <div>
+        <span class="label reveal">Handpicked For You</span>
+        <h2 class="heading reveal d1">Featured <em>Pieces</em></h2>
+      </div>
+      <a href="#contact" class="btn-ghost reveal d2">See All →</a>
+    </div>
+    <div class="products-track-wrap reveal" id="track-wrap">
+      <div class="products-track" id="products-track">
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['tshirt'] + """\" alt="Allen Solly Tee" style="object-position:top">
+            <div class="product-tag">Men's</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Allen Solly</div>
+            <div class="product-name">Mandarin Collar Tee</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['suit'] + """\" alt="Striped Suit" style="object-position:top">
+            <div class="product-tag">Formal</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Premium</div>
+            <div class="product-name">Striped Double Breasted Suit</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['kurta'] + """\" alt="Ethnic Wear" style="object-position:top">
+            <div class="product-tag">Women's</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Ethnic Collection</div>
+            <div class="product-name">Brocade Sharara Set</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['perf'] + """\" alt="Fragrances">
+            <div class="product-tag">Luxury</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Boss · Versace · Burberry</div>
+            <div class="product-name">Luxury Fragrances</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['tees'] + """\" alt="Designer Tees">
+            <div class="product-tag">Men's</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Boss · NASA</div>
+            <div class="product-name">Designer Graphic Tees</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">
+            <img src=\"""" + A['premium'] + """\" alt="Premium Shirts">
+            <div class="product-tag">Premium</div>
+          </div>
+          <div class="product-body">
+            <div class="product-brand">Ralph Lauren</div>
+            <div class="product-name">Signature Formal Shirts</div>
+            <button class="product-cta">Enquire Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint reveal">Drag to explore</div>
+  </div>
+</section>
+
+<!-- BRANDS -->
+<section class="section-sm" id="brands">
+  <div class="wrap">
+    <div class="brands-header">
+      <span class="label reveal">Authentically Stocked</span>
+      <h2 class="heading reveal d1">Brands We <em>Carry</em></h2>
+    </div>
+    <div class="brands-grid reveal d2">
+      """ + "".join([f'<div class="brand-pill"><span>{b}</span></div>' for b in ["Boss","Tommy Hilfiger","Ralph Lauren","Versace","Burberry","Marc Jacobs","Prada","Coach","Davidoff","Issey Miyake","Louis Vuitton","Allen Solly","Armani","NASA Collab","Mia K","Calvin Klein"]]) + """
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section" id="gallery">
+  <div class="wrap">
+    <div class="gallery-header">
+      <div>
+        <span class="label reveal">Inside the Store</span>
+        <h2 class="heading reveal d1">Our <em>Space</em></h2>
+      </div>
+    </div>
+    <div class="gallery-wall reveal">
+      <div class="gal-cell">
+        <img src=\"""" + A['store_main'] + """\" alt="Store">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Store View</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['shirts'] + """\" alt="Shirts">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Shirts</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['premium'] + """\" alt="Premium">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Premium</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['tees'] + """\" alt="Tees">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">T-Shirts</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['interior'] + """\" alt="Interior">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Interior</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['perf'] + """\" alt="Fragrances">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Fragrances</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['store_wide'] + """\" alt="Store Wide">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Wide View</div></div>
+      </div>
+      <div class="gal-cell">
+        <img src=\"""" + A['shirts'] + """\" alt="Collection">
+        <div class="gal-hover"><div class="gal-icon">✦</div><div class="gal-label">Collection</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="section" id="why">
+  <div class="wrap">
+    <span class="label reveal" style="text-align:center;display:block">Why Store In Jaipur</span>
+    <h2 class="heading reveal d1" style="text-align:center;max-width:500px;margin:0 auto">What Sets Us <em>Apart</em></h2>
+    <div class="why-grid reveal d2">
+      <div class="why-card">
+        <div class="why-num">01</div>
+        <div class="why-title">100% Authentic</div>
+        <p class="why-desc">Every product is genuine. We never compromise — that's our promise to Jaipur since day one.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-num">02</div>
+        <div class="why-title">Curated Selection</div>
+        <p class="why-desc">We don't stock everything — we stock the best. Each piece is chosen with taste, trends, and you in mind.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-num">03</div>
+        <div class="why-title">Men & Women</div>
+        <p class="why-desc">Complete fashion for both — from formal suits to ethnic wear, streetwear to luxury fragrances.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-num">04</div>
+        <div class="why-title">Prime Location</div>
+        <p class="why-desc">Opposite Chitrakoot Stadium, Jaipur. Right in the heart of the Pink City — easy to find, impossible to forget.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="label reveal">Get In Touch</span>
+        <h2 class="heading reveal d1">Visit Us <em>Today</em></h2>
+        <div class="divider reveal d2"></div>
+        <p class="reveal d3">Come experience the collection in person. Our team will help you find exactly what you're looking for — or something even better.</p>
+        <div class="info-row reveal d3">
+          <div class="info-row-label">Address</div>
+          <div class="info-row-val">B-4/179, Opposite Chitrakoot Stadium<br>Chitrakoot, Jaipur, Rajasthan 302021</div>
+        </div>
+        <div class="info-row reveal d4">
+          <div class="info-row-label">Store Hours</div>
+          <div class="info-row-val">Mon – Sat: 10:00 AM – 9:00 PM<br>Sunday: 11:00 AM – 8:00 PM</div>
+        </div>
+        <div class="info-row reveal d4">
+          <div class="info-row-label">Follow</div>
+          <div class="info-row-val">@storeinjaipur</div>
+        </div>
+        <img src=\"""" + A['store_wide'] + """\" class="contact-map-thumb reveal d5" alt="Store exterior">
+      </div>
+      <div class="form-box reveal d2">
+        <div class="form-2col">
+          <div class="form-group"><label>Your Name</label><input type="text" id="c-name" placeholder="Rahul Sharma"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="email@example.com"></div>
+        </div>
+        <div class="form-group">
+          <label>Category of Interest</label>
+          <select id="c-cat">
+            <option value="">Select a category...</option>
+            <option>Men's Clothing</option>
+            <option>Women's Clothing</option>
+            <option>Fragrances & Perfumes</option>
+            <option>Footwear</option>
+            <option>Formal & Suits</option>
+            <option>General Enquiry</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea id="c-msg" placeholder="Tell us what you're looking for..."></textarea></div>
+        <button class="btn-gold" style="width:100%" onclick="submitContact()"><span>Send Enquiry</span></button>
+        <p id="form-success">✦ Message received! We'll be in touch soon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-logo">STORE IN <span>JAIPUR</span></div>
+          <p class="footer-tagline">Premium fashion for men & women. Authentic global brands in the heart of Chitrakoot, Jaipur.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <a href="#hero">Home</a>
+          <a href="#about">About Us</a>
+          <a href="#collections">Collections</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Collections</h4>
+          <a href="#">Men's Clothing</a>
+          <a href="#">Women's Clothing</a>
+          <a href="#">Fragrances</a>
+          <a href="#">Formal & Suits</a>
+          <a href="#">Footwear</a>
+        </div>
+        <div class="footer-col">
+          <h4>Find Us</h4>
+          <p class="footer-address">B-4/179, Opposite<br>Chitrakoot Stadium<br>Chitrakoot, Jaipur<br>Rajasthan 302021</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Store In Jaipur. All rights reserved.</p>
+      <p class="footer-copy">Crafted with ♥ in Jaipur</p>
+    </div>
+  </div>
+</footer>
+
+</main>
+<!-- END MAIN SITE -->
+
+<!-- ===================== ADMIN PANEL ===================== -->
+<div id="admin-shell">
+  <div class="admin-sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">STORE IN <span>JAIPUR</span></div>
+      <div class="sidebar-badge">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="on" onclick="adminPanel('dashboard',this)"><span class="sidebar-nav-icon">◈</span>Dashboard</a>
+      <a href="#" onclick="adminPanel('products',this)"><span class="sidebar-nav-icon">✦</span>Products</a>
+      <a href="#" onclick="adminPanel('users',this)"><span class="sidebar-nav-icon">◎</span>Users</a>
+      <a href="#" onclick="adminPanel('messages',this)"><span class="sidebar-nav-icon">❋</span>Messages</a>
+      <a href="#" onclick="adminPanel('analytics',this)"><span class="sidebar-nav-icon">◆</span>Analytics</a>
+      <a href="#" onclick="adminPanel('settings',this)"><span class="sidebar-nav-icon">⚙</span>Settings</a>
+      <a href="#" onclick="exitAdmin(event)" style="margin-top:20px"><span class="sidebar-nav-icon">←</span>Back to Store</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sb-avatar">A</div>
+        <div><div class="sidebar-uname" id="sb-name">Admin</div><div class="sidebar-uemail" id="sb-email">admin@store.com</div></div>
+      </div>
+      <button class="sidebar-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="admin-main-wrap">
+    <div class="admin-topbar">
+      <h1 class="admin-page-title" id="admin-title">Dashboard <em>Overview</em></h1>
+      <div class="admin-date" id="admin-date"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="admin-panel on" id="ap-dashboard">
+      <div class="admin-stats">
+        <div class="a-stat"><div class="a-stat-label">Total Users</div><div class="a-stat-val" id="stat-users">0</div><div class="a-stat-sub">Registered accounts</div></div>
+        <div class="a-stat"><div class="a-stat-label">Products</div><div class="a-stat-val">18</div><div class="a-stat-sub">In catalogue</div></div>
+        <div class="a-stat"><div class="a-stat-label">Messages</div><div class="a-stat-val" id="stat-msgs">0</div><div class="a-stat-sub">Enquiries</div></div>
+        <div class="a-stat"><div class="a-stat-label">Store Views</div><div class="a-stat-val">2.4K</div><div class="a-stat-sub">This month</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px">
+        <div class="a-table-card">
+          <div class="a-table-head"><h3>Recent Users</h3><button class="a-btn" onclick="adminPanel('users',null)">View All</button></div>
+          <table><thead><tr><th>Name</th><th>Email</th><th>Status</th></tr></thead><tbody id="recent-users-tbody"></tbody></table>
+        </div>
+        <div class="a-table-card">
+          <div class="a-table-head"><h3>Category Hits</h3></div>
+          <div style="padding:24px" id="dash-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="admin-panel" id="ap-products">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px">
+        <p style="opacity:0.4;font-size:13px">Manage your store catalogue</p>
+        <button class="a-btn a-btn-gold" onclick="alert('Add product — coming in live build!')">+ Add Product</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="products-grid"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="admin-panel" id="ap-users">
+      <div class="a-table-card">
+        <div class="a-table-head"><h3>All Users</h3><button class="a-btn" onclick="exportCSV()">Export CSV</button></div>
+        <table><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead><tbody id="all-users-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="admin-panel" id="ap-messages">
+      <div id="messages-list"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="admin-panel" id="ap-analytics">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="a-table-card">
+          <div class="a-table-head"><h3>Category Popularity</h3></div>
+          <div style="padding:28px">
+            <div class="chart-bar-row"><span class="chart-bar-label">Men's Clothing</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="82%"></div></div><span class="chart-bar-val">82%</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Fragrances</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="68%"></div></div><span class="chart-bar-val">68%</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Footwear</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="55%"></div></div><span class="chart-bar-val">55%</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Women's</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="44%"></div></div><span class="chart-bar-val">44%</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Outerwear</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="31%"></div></div><span class="chart-bar-val">31%</span></div>
+          </div>
+        </div>
+        <div class="a-table-card">
+          <div class="a-table-head"><h3>Monthly Traffic</h3></div>
+          <div style="padding:28px">
+            <div class="chart-bar-row"><span class="chart-bar-label">Jan</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="58%"></div></div><span class="chart-bar-val">580</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Feb</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="72%"></div></div><span class="chart-bar-val">720</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Mar</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="90%"></div></div><span class="chart-bar-val">900</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">Apr</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="96%"></div></div><span class="chart-bar-val">960</span></div>
+            <div class="chart-bar-row"><span class="chart-bar-label">May</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="74%"></div></div><span class="chart-bar-val">740</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="admin-panel" id="ap-settings">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="a-table-card" style="padding:32px">
+          <h3 style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px">Store Information</h3>
+          <div class="form-group"><label>Store Name</label><input type="text" value="Store In Jaipur"></div>
+          <div class="form-group"><label>Address</label><input type="text" value="B-4/179, Chitrakoot, Jaipur 302021"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" value="+91 XXXXX XXXXX"></div>
+          <button class="a-btn a-btn-gold" onclick="alert('Saved! (Demo mode)')">Save Changes</button>
+        </div>
+        <div class="a-table-card" style="padding:32px">
+          <h3 style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px">Change Password</h3>
+          <div class="form-group"><label>Current Password</label><input type="password" placeholder="••••••••"></div>
+          <div class="form-group"><label>New Password</label><input type="password" placeholder="••••••••"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="••••••••"></div>
+          <button class="a-btn a-btn-gold" onclick="alert('Password update in live version!')">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- END ADMIN PANEL -->
+
+<script>
+/* ============================================
+   LOADER
+============================================ */
+let pct = 0;
+const pctEl = document.getElementById('loader-pct');
+const pctTimer = setInterval(() => {
+  pct = Math.min(pct + Math.random() * 12, 99);
+  pctEl.textContent = Math.floor(pct) + '%';
+}, 120);
+window.addEventListener('load', () => {
+  clearInterval(pctTimer);
+  pctEl.textContent = '100%';
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('gone');
+    initReveal();
+  }, 600);
+});
+
+/* ============================================
+   CURSOR
+============================================ */
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-circle');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+});
+(function cursorLoop() {
+  rx += (mx - rx) * 0.13;
+  ry += (my - ry) * 0.13;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(cursorLoop);
+})();
+document.querySelectorAll('a, button, .coll-item, .gal-cell, .product-card, .brand-pill').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    dot.style.transform = 'translate(-50%,-50%) scale(2.5)';
+    ring.style.width = '64px'; ring.style.height = '64px';
+    ring.style.borderColor = 'var(--gold)';
+  });
+  el.addEventListener('mouseleave', () => {
+    dot.style.transform = 'translate(-50%,-50%) scale(1)';
+    ring.style.width = '44px'; ring.style.height = '44px';
+    ring.style.borderColor = 'rgba(201,168,76,0.5)';
+  });
+});
+
+/* ============================================
+   NAVBAR SCROLL
+============================================ */
+const nav = document.getElementById('navbar');
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-center a[href^="#"]');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('sticky', scrollY > 50);
+  let cur = '';
+  sections.forEach(s => { if (scrollY >= s.offsetTop - 100) cur = s.id; });
+  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+});
+
+/* ============================================
+   REVEAL ON SCROLL
+============================================ */
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => obs.observe(el));
+}
+
+/* ============================================
+   SMOOTH SCROLL
+============================================ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ============================================
+   HORIZONTAL DRAG SCROLL
+============================================ */
+const track = document.getElementById('products-track');
+const wrap = document.getElementById('track-wrap');
+if (track && wrap) {
+  let isDown = false, startX, scrollLeft;
+  wrap.addEventListener('mousedown', e => {
+    isDown = true; wrap.style.cursor = 'grabbing';
+    startX = e.pageX - wrap.offsetLeft;
+    scrollLeft = wrap.scrollLeft;
+  });
+  wrap.addEventListener('mouseleave', () => { isDown = false; wrap.style.cursor = 'grab'; });
+  wrap.addEventListener('mouseup', () => { isDown = false; wrap.style.cursor = 'grab'; });
+  wrap.addEventListener('mousemove', e => {
+    if (!isDown) return; e.preventDefault();
+    const x = e.pageX - wrap.offsetLeft;
+    wrap.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  });
+  wrap.style.overflowX = 'auto';
+  wrap.style.scrollbarWidth = 'none';
+}
+
+/* ============================================
+   ANIMATE CHART BARS
+============================================ */
+function animateBars() {
+  document.querySelectorAll('.chart-bar-fill').forEach(b => {
+    const w = b.dataset.w;
+    if (w) setTimeout(() => b.style.width = w, 300);
+  });
+}
+
+/* ============================================
+   AUTH SYSTEM
+============================================ */
+const USERS_KEY = 'sij_users';
+const SESSION_KEY = 'sij_session';
+
+const Auth = {
+  getUsers: () => JSON.parse(localStorage.getItem(USERS_KEY) || '[]'),
+  saveUsers: u => localStorage.setItem(USERS_KEY, JSON.stringify(u)),
+  session: () => JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'),
+  login: u => sessionStorage.setItem(SESSION_KEY, JSON.stringify(u)),
+  logout: () => sessionStorage.removeItem(SESSION_KEY),
+  isAdmin: (email, pass) => email === 'admin@store.com' && pass === 'admin123',
+  register: (name, email, pass) => {
+    const users = Auth.getUsers();
+    if (users.find(u => u.email === email)) return false;
+    users.push({ name, email, pass, joinDate: new Date().toLocaleDateString('en-IN') });
+    Auth.saveUsers(users); return true;
+  }
+};
+
+function refreshNav() {
+  const user = Auth.session();
+  document.getElementById('nav-auth-buttons').style.display = user ? 'none' : 'flex';
+  const pill = document.getElementById('user-pill');
+  pill.style.display = user ? 'flex' : 'none';
+  const adminLink = document.getElementById('admin-nav-link');
+  adminLink.style.display = user && user.isAdmin ? 'inline-block' : 'none';
+  if (user) {
+    document.getElementById('user-name-display').textContent = user.name;
+    document.getElementById('user-avatar-circle').textContent = user.name[0].toUpperCase();
+  }
+}
+
+function openModal(tab) {
+  document.getElementById('auth-modal').classList.add('open');
+  switchTab(tab || 'login');
+}
+function closeModal() { document.getElementById('auth-modal').classList.remove('open'); }
+document.getElementById('auth-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+function switchTab(t) {
+  ['login','signup'].forEach(id => {
+    document.getElementById('tab-' + id).classList.toggle('on', id === t);
+    document.getElementById('panel-' + id).classList.toggle('on', id === t);
+  });
+}
+
+function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  if (!email || !pass) { err.textContent = 'Please fill all fields.'; err.style.display = 'block'; return; }
+  if (Auth.isAdmin(email, pass)) {
+    Auth.login({ name: 'Admin', email, isAdmin: true });
+    closeModal(); refreshNav(); return;
+  }
+  const user = Auth.getUsers().find(u => u.email === email && u.pass === pass);
+  if (!user) { err.textContent = 'Invalid email or password.'; err.style.display = 'block'; return; }
+  Auth.login({ name: user.name, email, isAdmin: false });
+  closeModal(); refreshNav();
+}
+
+function doSignup() {
+  const name = document.getElementById('s-name').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pass = document.getElementById('s-pass').value;
+  const err = document.getElementById('signup-err');
+  err.style.display = 'none';
+  if (!name || !email || !pass) { err.textContent = 'Please fill all fields.'; err.style.display = 'block'; return; }
+  if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.style.display = 'block'; return; }
+  if (!Auth.register(name, email, pass)) { err.textContent = 'Email already registered.'; err.style.display = 'block'; return; }
+  Auth.login({ name, email, isAdmin: false });
+  closeModal(); refreshNav();
+}
+
+function doLogout() { Auth.logout(); refreshNav(); exitAdmin(null); }
+
+/* ============================================
+   CONTACT FORM
+============================================ */
+function submitContact() {
+  const n = document.getElementById('c-name').value.trim();
+  const e = document.getElementById('c-email').value.trim();
+  const c = document.getElementById('c-cat').value;
+  const m = document.getElementById('c-msg').value.trim();
+  if (!n || !e || !m) return;
+  const msgs = JSON.parse(localStorage.getItem('sij_messages') || '[]');
+  msgs.push({ from: n, email: e, cat: c || 'General', text: m, date: new Date().toLocaleString('en-IN') });
+  localStorage.setItem('sij_messages', JSON.stringify(msgs));
+  document.getElementById('form-success').style.display = 'block';
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-email').value = '';
+  document.getElementById('c-msg').value = '';
+}
+
+/* ============================================
+   ADMIN PANEL
+============================================ */
+function openAdmin(e) {
+  if (e) e.preventDefault();
+  const user = Auth.session();
+  if (!user || !user.isAdmin) {
+    const ad = document.getElementById('access-denied');
+    ad.style.display = 'flex';
+    setTimeout(() => ad.style.display = 'none', 2000);
+    openModal('login'); return;
+  }
+  document.body.classList.add('admin-mode');
+  document.getElementById('admin-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('sb-name').textContent = user.name;
+  document.getElementById('sb-email').textContent = user.email;
+  document.getElementById('sb-avatar').textContent = user.name[0].toUpperCase();
+  loadAdmin();
+  animateBars();
+}
+
+function exitAdmin(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  document.body.classList.remove('admin-mode');
+  document.getElementById('access-denied').style.display = 'none';
+}
+
+function adminPanel(id, link) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('ap-' + id).classList.add('on');
+  if (link) { document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('on')); link.classList.add('on'); }
+  const titles = { dashboard:'Dashboard <em>Overview</em>', products:'Products <em>Catalogue</em>', users:'User <em>Management</em>', messages:'Customer <em>Messages</em>', analytics:'Store <em>Analytics</em>', settings:'Store <em>Settings</em>' };
+  document.getElementById('admin-title').innerHTML = titles[id] || id;
+  setTimeout(animateBars, 150);
+  if (id === 'messages') loadMessages();
+  if (id === 'users') loadUsers();
+}
+
+function loadAdmin() {
+  const users = Auth.getUsers();
+  document.getElementById('stat-users').textContent = users.length;
+  const msgs = JSON.parse(localStorage.getItem('sij_messages') || '[]');
+  document.getElementById('stat-msgs').textContent = msgs.length;
+
+  // Recent users
+  const recent = [...users].slice(-4).reverse();
+  document.getElementById('recent-users-tbody').innerHTML = recent.length
+    ? recent.map(u => `<tr><td>${u.name}</td><td style="opacity:0.4">${u.email}</td><td><span class="badge badge-green">Active</span></td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;opacity:0.3;padding:24px">No users yet</td></tr>';
+
+  // Dash chart
+  const cats = ["Men's","Women's","Fragrance","Footwear","Formal"];
+  const vals = [82, 44, 68, 55, 31];
+  document.getElementById('dash-chart').innerHTML = cats.map((c,i) =>
+    `<div class="chart-bar-row"><span class="chart-bar-label">${c}</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:0" data-w="${vals[i]}%"></div></div><span class="chart-bar-val">${vals[i]}%</span></div>`
+  ).join('');
+  setTimeout(animateBars, 200);
+
+  loadProducts();
+}
+
+function loadProducts() {
+  const items = [
+    {cat:"Men's", name:"Allen Solly Polo"},
+    {cat:"Formal", name:"Striped DB Suit"},
+    {cat:"Women's", name:"Brocade Set"},
+    {cat:"Fragrance", name:"Boss Perfume"},
+    {cat:"Men's", name:"NASA Graphic Tee"},
+    {cat:"Premium", name:"Ralph Lauren Shirt"},
+  ];
+  document.getElementById('products-grid').innerHTML = items.map(p => `
+    <div class="a-table-card" style="overflow:hidden">
+      <div style="height:160px;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:36px;opacity:0.2">✦</div>
+      <div style="padding:16px 18px;background:var(--dark2)">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">${p.cat}</div>
+        <div style="font-family:var(--serif);font-size:18px;font-weight:300;margin-bottom:12px">${p.name}</div>
+        <div style="display:flex;gap:8px">
+          <button class="a-btn" style="flex:1;padding:7px;font-size:9px" onclick="alert('Edit: ${p.name}')">Edit</button>
+          <button class="a-btn" style="flex:1;padding:7px;font-size:9px;border-color:rgba(224,85,85,0.3);color:#e05555" onclick="alert('Delete: ${p.name}')">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function loadUsers() {
+  const users = Auth.getUsers();
+  const all = [{ name:'Admin', email:'admin@store.com', isAdmin:true, joinDate:'System' }, ...users];
+  document.getElementById('all-users-tbody').innerHTML = all.map((u, i) =>
+    `<tr><td style="opacity:0.3">${i+1}</td><td>${u.name}</td><td style="opacity:0.45">${u.email}</td><td><span class="badge ${u.isAdmin ? 'badge-gold' : 'badge-green'}">${u.isAdmin ? 'Admin' : 'User'}</span></td><td style="opacity:0.3">${u.joinDate || '—'}</td></tr>`
+  ).join('') || '<tr><td colspan="5" style="text-align:center;opacity:0.3;padding:28px">No users</td></tr>';
+}
+
+function loadMessages() {
+  const msgs = JSON.parse(localStorage.getItem('sij_messages') || '[]');
+  const demo = [
+    { from: 'Rahul Sharma', cat: "Men's Clothing", text: 'Do you have Boss T-shirts in XL?', date: 'Today, 3:20 PM' },
+    { from: 'Priya Singh', cat: 'Fragrances', text: 'Is Versace Eros available?', date: 'Yesterday, 5:45 PM' },
+    { from: 'Amit Kumar', cat: 'Footwear', text: 'What formal shoe sizes do you stock?', date: '2 days ago' }
+  ];
+  const all = [...msgs, ...demo];
+  document.getElementById('messages-list').innerHTML = all.map(m =>
+    `<div class="msg-card">
+      <div class="msg-from">${m.from || m.name || 'Anonymous'}</div>
+      <div class="msg-meta">${m.cat || 'General'}</div>
+      <div class="msg-body">${m.text || m.message || ''}</div>
+      <div class="msg-time">${m.date || 'Recent'}</div>
+    </div>`
+  ).join('') || '<p style="opacity:0.3;padding:24px">No messages yet</p>';
+}
+
+function exportCSV() {
+  const users = Auth.getUsers();
+  const csv = 'Name,Email,Joined\\n' + users.map(u => `${u.name},${u.email},${u.joinDate || ''}`).join('\\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'sij_users.csv'; a.click();
+}
+
+/* INIT */
+refreshNav();
+
+/* Keyboard shortcut: Escape closes modal */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>"""
+
+with open('/mnt/user-data/outputs/store_jaipur/index.html', 'w') as f:
+    f.write(html)
+
+print(f"Done: {len(html):,} chars = {len(html)/1024/1024:.1f} MB")
+PYEOF
